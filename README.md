@@ -1,0 +1,204 @@
+# 🔌 USBWatch
+
+A cross-platform USB device monitoring tool written in Rust that provides real-time detection of USB device connection and disconnection events.
+
+## ✨ Features
+
+- **Cross-Platform Support**: Works on Linux and Windows
+- **Real-Time Monitoring**: Detect USB device events as they happen
+- **Multiple Output Formats**: Plain text and JSON output
+- **File Logging**: Save events to a log file
+- **Built-in Installation**: Install and uninstall from system PATH
+- **Lightweight**: Fast, efficient monitoring with minimal resource usage
+
+## 🚀 Quick Start
+
+### Installation
+
+```bash
+# Build the project
+cargo build --release
+
+# Install to system PATH (requires sudo on Unix systems)
+sudo ./target/release/usbwatch install
+
+# Verify installation
+usbwatch --help
+```
+
+### Basic Usage
+
+```bash
+# Monitor USB devices (default behaviour)
+usbwatch
+
+# Monitor with JSON output
+usbwatch --json
+
+# Monitor and log to file
+usbwatch --logfile usb-events.log
+
+# Monitor with both JSON and file logging
+usbwatch --json --logfile usb-events.json
+```
+
+## 📋 Commands
+
+### Monitor (Default)
+
+```bash
+usbwatch [OPTIONS]
+usbwatch monitor [OPTIONS]
+```
+
+Monitor USB device events in real-time.
+
+**Options:**
+
+- `--json` - Output events in JSON format
+- `--logfile <PATH>` - Log events to the specified file
+
+### Install
+
+```bash
+usbwatch install
+```
+
+Install the `usbwatch` binary to your system PATH. On Unix systems, this requires administrator privileges.
+
+### Uninstall
+
+```bash
+usbwatch uninstall
+```
+
+Remove the `usbwatch` binary from your system PATH.
+
+## 📊 Output Examples
+
+### Plain Text Format
+
+```
+🔌 USB Device Monitor - usbwatch v0.1.0
+Press Ctrl+C to stop monitoring...
+Starting USB device monitoring on Linux...
+[2025-07-27 10:30:15 UTC] CONNECTED - SanDisk Ultra USB 3.0 (VID: 0781, PID: 5583) Serial: 4C530001234567891234
+[2025-07-27 10:30:45 UTC] DISCONNECTED - SanDisk Ultra USB 3.0 (VID: 0781, PID: 5583) Serial: 4C530001234567891234
+```
+
+### JSON Format
+
+```json
+{"device_name":"SanDisk Ultra USB 3.0","vendor_id":"0781","product_id":"5583","serial_number":"4C530001234567891234","timestamp":"2025-07-27T10:30:15.123456789Z","event_type":"Connected"}
+{"device_name":"SanDisk Ultra USB 3.0","vendor_id":"0781","product_id":"5583","serial_number":"4C530001234567891234","timestamp":"2025-07-27T10:30:45.987654321Z","event_type":"Disconnected"}
+```
+
+## 🏗️ Building from Source
+
+### Prerequisites
+
+- [Rust](https://rustup.rs/) (2024 edition or later)
+- On Windows: MinGW-w64 toolchain for cross-compilation
+
+### Build Commands
+
+```bash
+# Clone the repository
+git clone https://github.com/NotKeira/usbwatch-rs.git
+cd usbwatch-rs
+
+# Build for your current platform
+cargo build --release
+
+# Cross-compile for Windows (from Linux)
+cargo build --release --target x86_64-pc-windows-gnu
+```
+
+## 🔧 Platform-Specific Details
+
+### Linux
+
+- Uses the `sysfs` filesystem (`/sys/bus/usb/devices`)
+- Monitors USB hubs and connected devices
+- Requires no special permissions for monitoring
+
+### Windows
+
+- Uses Win32 Device Installation APIs
+- Monitors PnP (Plug and Play) device events
+- May require administrator privileges for certain device information
+
+## 📂 Project Structure
+
+```
+usbwatch-rs/
+├── src/
+│   ├── main.rs           # CLI interface and subcommands
+│   ├── device_info.rs    # USB device data structures
+│   ├── logger.rs         # Output formatting and file logging
+│   └── watcher/          # Platform-specific monitoring
+│       ├── mod.rs        # Cross-platform abstraction
+│       ├── linux.rs      # Linux sysfs implementation
+│       └── windows.rs    # Windows Win32 API implementation
+├── Cargo.toml            # Project configuration
+├── README.md             # This file
+└── INSTALL.md            # Detailed installation guide
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit issues and pull requests.
+
+### Development Setup
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Make your changes and add tests
+4. Ensure code passes `cargo clippy` and `cargo test`
+5. Commit using conventional commit format: `git commit -m "feat: add new feature"`
+6. Push to your fork and submit a pull request
+
+## 📄 Licence
+
+This project is licensed under the MIT Licence - see the [LICENCE](LICENCE) file for details.
+
+## 🔗 Related Projects
+
+- [lsusb](https://linux.die.net/man/8/lsusb) - List USB devices (Linux)
+- [USBDeview](https://www.nirsoft.net/utils/usb_devices_view.html) - USB device viewer (Windows)
+- [System Information](https://support.apple.com/en-gb/guide/system-information/welcome/mac) - macOS system information
+
+## 📊 Performance
+
+USBWatch is designed to be lightweight and efficient:
+
+- Minimal CPU usage during monitoring
+- Low memory footprint
+- Configurable polling intervals
+- No blocking operations in the main thread
+
+## 🆘 Troubleshooting
+
+### Common Issues
+
+**Permission Denied (Linux)**
+
+```bash
+# Ensure you have read access to USB device information
+ls -la /sys/bus/usb/devices
+```
+
+**Installation Fails**
+
+```bash
+# Ensure you have write permissions to the installation directory
+sudo usbwatch install
+```
+
+**No Devices Detected**
+
+- Verify USB devices are properly connected
+- Check that your system has USB support enabled
+- On Linux, ensure sysfs is mounted at `/sys`
+
+For more detailed troubleshooting, see [INSTALL.md](INSTALL.md).
