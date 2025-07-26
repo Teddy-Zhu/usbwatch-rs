@@ -19,7 +19,7 @@ impl Logger {
                     .create(true)
                     .append(true)
                     .open(path)
-                    .map_err(|e| format!("Failed to open log file '{}': {}", path, e))?,
+                    .map_err(|e| format!("Failed to open log file '{path}': {e}"))?,
             )
         } else {
             None
@@ -42,11 +42,11 @@ impl Logger {
         };
 
         // Print to stdout
-        println!("{}", output);
+        println!("{output}");
 
         // Write to log file if specified
         if let Some(ref mut file) = self.log_file {
-            writeln!(file, "{}", output)?;
+            writeln!(file, "{output}")?;
             file.flush()?;
         }
 
@@ -57,7 +57,7 @@ impl Logger {
 pub async fn logger_task(mut rx: mpsc::Receiver<UsbDeviceInfo>, mut logger: Logger) {
     while let Some(device_info) = rx.recv().await {
         if let Err(e) = logger.log_device_event(&device_info) {
-            eprintln!("Error logging device event: {}", e);
+            eprintln!("Error logging device event: {e}");
         }
     }
 }

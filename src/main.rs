@@ -43,7 +43,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Handle Ctrl+C gracefully
     let watcher_handle = tokio::spawn(async move {
         if let Err(e) = watcher.start_monitoring().await {
-            eprintln!("USB monitoring error: {}", e);
+            eprintln!("USB monitoring error: {e}");
         }
     });
 

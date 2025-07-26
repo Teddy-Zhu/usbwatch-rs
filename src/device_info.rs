@@ -44,7 +44,7 @@ impl UsbDeviceInfo {
         let serial_str = self
             .serial_number
             .as_ref()
-            .map(|s| format!(" Serial: {}", s))
+            .map(|s| format!(" Serial: {s}"))
             .unwrap_or_default();
 
         format!(

@@ -48,7 +48,7 @@ impl LinuxUsbWatcher {
                             let mut device_clone = device.clone();
                             device_clone.event_type = DeviceEventType::Connected;
                             if let Err(e) = self.tx.send(device_clone).await {
-                                eprintln!("Failed to send device event: {}", e);
+                                eprintln!("Failed to send device event: {e}");
                             }
                         }
                     }
@@ -59,7 +59,7 @@ impl LinuxUsbWatcher {
                             let mut device_clone = device.clone();
                             device_clone.event_type = DeviceEventType::Disconnected;
                             if let Err(e) = self.tx.send(device_clone).await {
-                                eprintln!("Failed to send device event: {}", e);
+                                eprintln!("Failed to send device event: {e}");
                             }
                         }
                     }
@@ -67,7 +67,7 @@ impl LinuxUsbWatcher {
                     known_devices = current_map;
                 }
                 Err(e) => {
-                    eprintln!("Error scanning USB devices: {}", e);
+                    eprintln!("Error scanning USB devices: {e}");
                 }
             }
 
@@ -109,7 +109,7 @@ impl LinuxUsbWatcher {
                             devices.push(device_info);
                         }
                     } else {
-                        println!("Failed to parse device: {}", name);
+                        println!("Failed to parse device: {name}");
                     }
                 }
             }
@@ -135,7 +135,7 @@ impl LinuxUsbWatcher {
         let serial_number = self.read_sys_file(device_path, "serial");
 
         let device_name = if !manufacturer.is_empty() && !product_name.is_empty() {
-            format!("{} {}", manufacturer, product_name)
+            format!("{manufacturer} {product_name}")
         } else if !product_name.is_empty() {
             product_name
         } else {

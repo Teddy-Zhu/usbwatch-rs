@@ -46,7 +46,7 @@ impl UsbWatcher {
             UsbWatcher::Linux(watcher) => Ok(watcher
                 .start_monitoring()
                 .await
-                .map_err(|e| Box::new(std::io::Error::new(std::io::ErrorKind::Other, e)))?),
+                .map_err(|e| Box::new(std::io::Error::other(e)))?),
             #[cfg(not(any(target_os = "windows", target_os = "linux")))]
             UsbWatcher::Unsupported => {
                 eprintln!("USB monitoring not supported on this platform");
