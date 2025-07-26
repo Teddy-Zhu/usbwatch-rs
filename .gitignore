@@ -1,1 +1,5 @@
 /target
+.cargo
+build.log
+windows_build.log
+test.log
