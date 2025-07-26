@@ -5,11 +5,7 @@ use std::collections::HashSet;
 #[cfg(target_os = "windows")]
 use tokio::sync::mpsc;
 #[cfg(target_os = "windows")]
-use windows::{
-    Win32::Devices::DeviceAndDriverInstallation::*,
-    Win32::Foundation::*,
-    core::*,
-};
+use windows::{Win32::Devices::DeviceAndDriverInstallation::*, core::*};
 
 #[cfg(target_os = "windows")]
 pub struct WindowsUsbWatcher {
@@ -90,7 +86,7 @@ impl WindowsUsbWatcher {
             if SetupDiClassGuidsFromNameA(
                 windows::core::s!("USB"),
                 &mut class_guid_buffer,
-                Some(&mut required_size),
+                &mut required_size,
             )
             .is_err()
             {
@@ -99,13 +95,9 @@ impl WindowsUsbWatcher {
             let class_guid = class_guid_buffer[0];
 
             // Get device information set
-            let device_info_set = SetupDiGetClassDevsA(
-                Some(&class_guid),
-                PCSTR::null(),
-                None,
-                DIGCF_PRESENT,
-            )
-            .map_err(|e| format!("Failed to get device info set: {}", e))?;
+            let device_info_set =
+                SetupDiGetClassDevsA(Some(&class_guid), PCSTR::null(), None, DIGCF_PRESENT)
+                    .map_err(|e| format!("Failed to get device info set: {}", e))?;
 
             if device_info_set.is_invalid() {
                 return Err("Failed to get device information set".to_string());
@@ -168,7 +160,6 @@ impl WindowsUsbWatcher {
             DeviceEventType::Connected, // Will be updated by caller
         ))
     }
-    }
 
     fn get_device_property(
         &self,
@@ -181,7 +172,7 @@ impl WindowsUsbWatcher {
             let mut property_type = 0u32;
 
             // Get required buffer size
-            SetupDiGetDeviceRegistryPropertyA(
+            let _ = SetupDiGetDeviceRegistryPropertyA(
                 device_info_set,
                 device_info_data,
                 property,
