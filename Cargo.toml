@@ -3,6 +3,10 @@ name = "usbwatch-rs"
 version = "0.1.0"
 edition = "2024"
 
+[[bin]]
+name = "usbwatch"
+path = "src/main.rs"
+
 [dependencies]
 clap = { version = "4.5.41", features = ["derive"] }
 chrono = { version = "0.4.41", features = ["serde"] }
