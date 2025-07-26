@@ -31,7 +31,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create channel for device events
     let (tx, rx) = mpsc::channel(100);
 
-    // Initialize logger
+    // Initialise logger
     let logger = Logger::new(cli.json, cli.logfile.as_deref())?;
 
     // Start logger task
