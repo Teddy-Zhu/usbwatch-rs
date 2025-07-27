@@ -13,18 +13,7 @@ A cross-platform USB device monitoring tool written in Rust that provides real-t
 
 ## 🚀 Quick Start
 
-### Installation
-
-```bash
-# Build the project
-cargo build --release
-
-# Install to system PATH (requires sudo on Unix systems)
-sudo ./target/release/usbwatch install
-
-# Verify installation
-usbwatch --help
-```
+For installation, troubleshooting, and platform-specific details, see [INSTALL.md](INSTALL.md).
 
 ### Basic Usage
 
@@ -93,42 +82,10 @@ Starting USB device monitoring on Linux...
 {"device_name":"SanDisk Ultra USB 3.0","vendor_id":"0781","product_id":"5583","serial_number":"4C530001234567891234","timestamp":"2025-07-27T10:30:45.987654321Z","event_type":"Disconnected"}
 ```
 
-## 🏗️ Building from Source
-
-### Prerequisites
-
-- [Rust](https://rustup.rs/) (2024 edition or later)
-- On Windows: MinGW-w64 toolchain for cross-compilation
-
-### Build Commands
-
-```bash
-# Clone the repository
 git clone https://github.com/NotKeira/usbwatch-rs.git
-cd usbwatch-rs
-
-# Build for your current platform
-cargo build --release
-
-# Cross-compile for Windows (from Linux)
 cargo build --release --target x86_64-pc-windows-gnu
-```
 
-## 🔧 Platform-Specific Details
-
-### Linux
-
-- Uses the `sysfs` filesystem (`/sys/bus/usb/devices`)
-- Monitors USB hubs and connected devices
-- Requires no special permissions for monitoring
-
-### Windows
-
-- Uses Win32 Device Installation APIs
-- Monitors PnP (Plug and Play) device events
-- May require administrator privileges for certain device information
-
-## 📂 Project Structure
+## Project Structure
 
 ```
 usbwatch-rs/
@@ -176,29 +133,3 @@ USBWatch is designed to be lightweight and efficient:
 - Low memory footprint
 - Configurable polling intervals
 - No blocking operations in the main thread
-
-## 🆘 Troubleshooting
-
-### Common Issues
-
-**Permission Denied (Linux)**
-
-```bash
-# Ensure you have read access to USB device information
-ls -la /sys/bus/usb/devices
-```
-
-**Installation Fails**
-
-```bash
-# Ensure you have write permissions to the installation directory
-sudo usbwatch install
-```
-
-**No Devices Detected**
-
-- Verify USB devices are properly connected
-- Check that your system has USB support enabled
-- On Linux, ensure sysfs is mounted at `/sys`
-
-For more detailed troubleshooting, see [INSTALL.md](INSTALL.md).
