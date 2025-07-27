@@ -92,7 +92,7 @@ impl UsbWatcher {
     /// use tokio::sync::mpsc;
     ///
     /// # #[tokio::main]
-    /// # async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let (tx, mut rx) = mpsc::channel(100);
     /// let watcher = UsbWatcher::new(tx)?;
     ///
