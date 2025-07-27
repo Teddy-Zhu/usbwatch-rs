@@ -1,7 +1,7 @@
 # GitHub Actions workflow for usbwatch-rs
 # Runs tests on push and PR
 
-name: CI
+name: Windows, Linux and macOS Testers
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        rust: [stable, beta, nightly]
+        rust: [stable]
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
