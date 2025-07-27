@@ -1,11 +1,11 @@
 #[cfg(target_os = "windows")]
-use crate::device_info::{DeviceEventType, UsbDeviceInfo};
+use crate::device_info::{DeviceEventType, DeviceHandle, UsbDeviceInfo};
 #[cfg(target_os = "windows")]
 use std::collections::HashSet;
 #[cfg(target_os = "windows")]
 use tokio::sync::mpsc;
 #[cfg(target_os = "windows")]
-use windows::{Win32::Devices::DeviceAndDriverInstallation::*, core::*};
+use windows::{core::*, Win32::Devices::DeviceAndDriverInstallation::*};
 
 #[cfg(target_os = "windows")]
 pub struct WindowsUsbWatcher {
