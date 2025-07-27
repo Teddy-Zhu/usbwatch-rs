@@ -82,9 +82,6 @@ Starting USB device monitoring on Linux...
 {"device_name":"SanDisk Ultra USB 3.0","vendor_id":"0781","product_id":"5583","serial_number":"4C530001234567891234","timestamp":"2025-07-27T10:30:45.987654321Z","event_type":"Disconnected"}
 ```
 
-git clone https://github.com/NotKeira/usbwatch-rs.git
-cargo build --release --target x86_64-pc-windows-gnu
-
 ## Project Structure
 
 ```
