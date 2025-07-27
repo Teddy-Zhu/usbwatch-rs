@@ -15,6 +15,9 @@ use tokio::sync::mpsc;
 /// This watcher uses the Linux sysfs filesystem (`/sys/bus/usb/devices`) to monitor
 /// USB device connections and disconnections. It polls the filesystem periodically
 /// to detect changes and sends events through the provided channel.
+///
+/// Device handles are provided for each detected device, including sysfs path.
+/// Future versions may detect device nodes (e.g., `/dev/ttyUSB0`).
 pub struct LinuxUsbWatcher {
     tx: mpsc::Sender<UsbDeviceInfo>,
 }
