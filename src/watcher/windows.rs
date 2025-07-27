@@ -1,3 +1,8 @@
+//!
+//! Windows-specific USB device watcher implementation.
+//!
+//! Device handles will be provided for each detected device in future versions.
+//!
 #[cfg(target_os = "windows")]
 use crate::device_info::{DeviceEventType, DeviceHandle, UsbDeviceInfo};
 #[cfg(target_os = "windows")]
