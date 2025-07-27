@@ -9,10 +9,10 @@
 //! - File logging respects system file permissions and will fail if permissions are insufficient.
 
 use crate::device_info::UsbDeviceInfo;
+use colored::*;
 use std::fs::OpenOptions;
 use std::io::Write;
 use tokio::sync::mpsc;
-
 /// Configuration and state for logging USB device events.
 ///
 /// The logger handles output formatting and can write to both console
@@ -89,46 +89,41 @@ impl Logger {
     ) -> Result<(), Box<dyn std::error::Error>> {
         if self.output_json {
             let json = serde_json::to_string(device_info)?;
-            println!("{}", json);
+            println!("{json}");
             if let Some(file) = &mut self.log_file {
-                writeln!(file, "{}", json)?;
+                writeln!(file, "{json}")?;
                 file.flush()?;
             }
         } else {
-            use anstyle::{AnsiColor, Style, WriteAnsi};
             let event_icon = match device_info.event_type {
                 crate::device_info::DeviceEventType::Connected => "🔌",
                 crate::device_info::DeviceEventType::Disconnected => "❌",
             };
-            let style = if self.colorful {
+            let styled_name = if self.colorful {
                 match device_info.event_type {
                     crate::device_info::DeviceEventType::Connected => {
-                        Style::new().fg_color(Some(AnsiColor::Green))
+                        device_info.device_name.green().bold()
                     }
                     crate::device_info::DeviceEventType::Disconnected => {
-                        Style::new().fg_color(Some(AnsiColor::Red))
+                        device_info.device_name.red().bold()
                     }
                 }
             } else {
-                Style::new()
+                device_info.device_name.normal()
             };
-            let mut buf = Vec::new();
-            write!(buf, "{} ", event_icon)?;
-            style.write_ansi(&mut buf)?;
-            write!(
-                buf,
-                "{} | VID: {} PID: {} | Serial: {} | Event: {:?} | {}",
-                device_info.device_name,
+            let output = format!(
+                "{} {} | VID: {} PID: {} | Serial: {} | Event: {:?} | {}",
+                event_icon,
+                styled_name,
                 device_info.vendor_id,
                 device_info.product_id,
                 device_info.serial_number.as_deref().unwrap_or("-"),
                 device_info.event_type,
                 device_info.timestamp
-            )?;
-            let output = String::from_utf8_lossy(&buf);
-            println!("{}", output);
+            );
+            println!("{output}");
             if let Some(file) = &mut self.log_file {
-                writeln!(file, "{}", output)?;
+                writeln!(file, "{output}")?;
                 file.flush()?;
             }
         }
