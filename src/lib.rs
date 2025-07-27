@@ -54,19 +54,21 @@
 //!         println!("Device event: {}", device_info);
 //!         // Access platform-specific device handle
 //!         match device_info.as_device_handle() {
+//!             #[cfg(target_os = "linux")]
 //!             DeviceHandle::Linux { sysfs_path, device_node } => {
 //!                 println!("Linux sysfs path: {}", sysfs_path);
 //!                 if let Some(node) = device_node {
 //!                     println!("Device node: {}", node);
 //!                 }
 //!             }
+//!             #[cfg(target_os = "windows")]
 //!             DeviceHandle::Windows { instance_id, interface_path } => {
 //!                 println!("Windows instance ID: {}", instance_id);
 //!                 if let Some(path) = interface_path {
 //!                     println!("Interface path: {}", path);
 //!                 }
 //!             }
-//!             DeviceHandle::Unknown => {
+//!             _ => {
 //!                 println!("No platform-specific handle available");
 //!             }
 //!         }
