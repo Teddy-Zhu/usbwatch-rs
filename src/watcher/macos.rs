@@ -14,6 +14,10 @@ use std::ffi::CStr;
 use tokio::sync::mpsc;
 
 #[cfg(target_os = "macos")]
+/// Watches for USB device events on macOS using IOKit.
+///
+/// This struct provides asynchronous monitoring of USB device connections and disconnections
+/// on macOS, sending events through a Tokio channel.
 pub struct MacosUsbWatcher {
     tx: mpsc::Sender<UsbDeviceInfo>,
 }
@@ -21,10 +25,23 @@ pub struct MacosUsbWatcher {
 #[cfg(target_os = "macos")]
 impl MacosUsbWatcher {
     pub fn new(tx: mpsc::Sender<UsbDeviceInfo>) -> Self {
+        /// Creates a new `MacosUsbWatcher` with the given channel sender.
+        ///
+        /// # Arguments
+        ///
+        /// * `tx` - Tokio channel sender for publishing USB device events.
         Self { tx }
     }
 
     pub async fn start_monitoring(&self) -> Result<(), String> {
+        /// Starts monitoring USB devices on macOS.
+        ///
+        /// Enumerates currently connected USB devices and sends their info through the channel.
+        /// In a full implementation, this would register for device notifications and run the event loop.
+        ///
+        /// # Errors
+        ///
+        /// Returns an error if IOKit FFI calls fail or device enumeration cannot be performed.
         println!("Starting USB device monitoring on macOS...");
         // SAFETY: FFI calls to IOKit
         unsafe {
