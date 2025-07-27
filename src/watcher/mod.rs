@@ -92,13 +92,15 @@ impl UsbWatcher {
     /// use tokio::sync::mpsc;
     ///
     /// # #[tokio::main]
-    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     /// let (tx, mut rx) = mpsc::channel(100);
     /// let watcher = UsbWatcher::new(tx)?;
     ///
     /// // Start monitoring in background
     /// tokio::spawn(async move {
-    ///     watcher.start_monitoring().await
+    ///     if let Err(e) = watcher.start_monitoring().await {
+    ///         eprintln!("Monitoring error: {}", e);
+    ///     }
     /// });
     ///
     /// // Process events
@@ -121,9 +123,7 @@ impl UsbWatcher {
                 .await
                 .map_err(|e| Box::new(std::io::Error::other(e)))?),
             #[cfg(not(any(target_os = "windows", target_os = "linux")))]
-            UsbWatcher::Unsupported => {
-                Err("USB monitoring not supported on this platform".into())
-            }
+            UsbWatcher::Unsupported => Err("USB monitoring not supported on this platform".into()),
         }
     }
 }
