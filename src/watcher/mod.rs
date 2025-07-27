@@ -1,21 +1,60 @@
+//! Cross-platform USB device monitoring implementations.
+//!
+//! This module provides platform-specific USB monitoring implementations
+//! that are abstracted behind a common `UsbWatcher` interface.
+
+/// Linux-specific USB monitoring implementation using sysfs.
 #[cfg(target_os = "linux")]
 pub mod linux;
+
+/// Windows-specific USB monitoring implementation using Win32 APIs.
 #[cfg(target_os = "windows")]
 pub mod windows;
 
 use crate::device_info::UsbDeviceInfo;
 use tokio::sync::mpsc;
 
+/// Cross-platform USB device watcher.
+///
+/// This enum provides a unified interface for USB monitoring across
+/// different operating systems. The appropriate implementation is
+/// selected at compile time based on the target platform.
 pub enum UsbWatcher {
+    /// Windows implementation using Win32 APIs
     #[cfg(target_os = "windows")]
     Windows(windows::WindowsUsbWatcher),
+    /// Linux implementation using sysfs
     #[cfg(target_os = "linux")]
     Linux(linux::LinuxUsbWatcher),
+    /// Placeholder for unsupported platforms
     #[cfg(not(any(target_os = "windows", target_os = "linux")))]
     Unsupported,
 }
 
 impl UsbWatcher {
+    /// Creates a new USB watcher for the current platform.
+    ///
+    /// # Arguments
+    ///
+    /// * `sender` - Channel sender for publishing device events
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the platform-specific watcher cannot be initialised.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// use usbwatch_rs::UsbWatcher;
+    /// use tokio::sync::mpsc;
+    ///
+    /// # #[tokio::main]
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let (tx, rx) = mpsc::channel(100);
+    /// let watcher = UsbWatcher::new(tx)?;
+    /// # Ok(())
+    /// # }
+    /// ```
     pub fn new(sender: mpsc::Sender<UsbDeviceInfo>) -> Result<Self, Box<dyn std::error::Error>> {
         #[cfg(target_os = "windows")]
         {
@@ -35,6 +74,40 @@ impl UsbWatcher {
         }
     }
 
+    /// Starts monitoring USB devices.
+    ///
+    /// This method runs indefinitely, monitoring for USB device connection
+    /// and disconnection events. Events are sent through the channel provided
+    /// during construction.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if monitoring cannot be started or if a critical
+    /// error occurs during monitoring.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// use usbwatch_rs::UsbWatcher;
+    /// use tokio::sync::mpsc;
+    ///
+    /// # #[tokio::main]
+    /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// let (tx, mut rx) = mpsc::channel(100);
+    /// let watcher = UsbWatcher::new(tx)?;
+    ///
+    /// // Start monitoring in background
+    /// tokio::spawn(async move {
+    ///     watcher.start_monitoring().await
+    /// });
+    ///
+    /// // Process events
+    /// while let Some(device_info) = rx.recv().await {
+    ///     println!("USB event: {}", device_info);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
     pub async fn start_monitoring(&self) -> Result<(), Box<dyn std::error::Error>> {
         match self {
             #[cfg(target_os = "windows")]
@@ -49,8 +122,7 @@ impl UsbWatcher {
                 .map_err(|e| Box::new(std::io::Error::other(e)))?),
             #[cfg(not(any(target_os = "windows", target_os = "linux")))]
             UsbWatcher::Unsupported => {
-                eprintln!("USB monitoring not supported on this platform");
-                Ok(())
+                Err("USB monitoring not supported on this platform".into())
             }
         }
     }

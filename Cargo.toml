@@ -1,13 +1,18 @@
 [package]
 name = "usbwatch-rs"
 version = "0.2.1"
-edition = "2024"
-authors = ["NotKeira"]
-description = "A cross-platform USB device monitoring tool"
+edition = "2021"
+rust-version = "1.75.0"
+authors = ["NotKeira <rust-pkgs@accounts.keira.boo>"]
+description = "A cross-platform USB device monitoring tool written in Rust"
+documentation = "https://docs.rs/usbwatch-rs"
+homepage = "https://github.com/NotKeira/usbwatch-rs"
 repository = "https://github.com/NotKeira/usbwatch-rs"
-license = "MIT"
-keywords = ["usb", "monitoring", "cross-platform", "devices"]
+license = "Apache-2.0"
+readme = "README.md"
+keywords = ["usb", "monitoring", "cross-platform", "devices", "hardware"]
 categories = ["command-line-utilities", "hardware-support"]
+include = ["src/**/*", "LICENSE", "README.md", "INSTALL.md", "Cargo.toml"]
 
 [[bin]]
 name = "usbwatch"
