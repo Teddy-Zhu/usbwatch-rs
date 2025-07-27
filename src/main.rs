@@ -78,8 +78,10 @@ async fn run_monitor(
     // Create channel for device events
     let (tx, rx) = mpsc::channel(100);
 
+    // Detect if terminal supports color
+    let colorful = atty::is(atty::Stream::Stdout);
     // Initialise logger
-    let logger = Logger::new(json, logfile.as_deref())?;
+    let logger = Logger::new(json, logfile.as_deref(), colorful)?;
 
     // Start logger task
     let logger_handle = tokio::spawn(logger_task(rx, logger));

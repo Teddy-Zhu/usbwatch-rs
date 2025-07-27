@@ -20,6 +20,7 @@ use tokio::sync::mpsc;
 pub struct Logger {
     output_json: bool,
     log_file: Option<std::fs::File>,
+    colorful: bool,
 }
 
 impl Logger {
@@ -49,6 +50,7 @@ impl Logger {
     pub fn new(
         output_json: bool,
         log_file_path: Option<&str>,
+        colorful: bool,
     ) -> Result<Self, Box<dyn std::error::Error>> {
         let log_file = if let Some(path) = log_file_path {
             Some(
@@ -65,6 +67,7 @@ impl Logger {
         Ok(Self {
             output_json,
             log_file,
+            colorful,
         })
     }
 
@@ -84,21 +87,51 @@ impl Logger {
         &mut self,
         device_info: &UsbDeviceInfo,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        let output = if self.output_json {
-            serde_json::to_string(device_info)?
+        if self.output_json {
+            let json = serde_json::to_string(device_info)?;
+            println!("{}", json);
+            if let Some(file) = &mut self.log_file {
+                writeln!(file, "{}", json)?;
+                file.flush()?;
+            }
         } else {
-            device_info.format_plain()
-        };
-
-        // Print to stdout
-        println!("{output}");
-
-        // Write to log file if specified
-        if let Some(ref mut file) = self.log_file {
-            writeln!(file, "{output}")?;
-            file.flush()?;
+            use anstyle::{AnsiColor, Style, WriteAnsi};
+            let event_icon = match device_info.event_type {
+                crate::device_info::DeviceEventType::Connected => "🔌",
+                crate::device_info::DeviceEventType::Disconnected => "❌",
+            };
+            let style = if self.colorful {
+                match device_info.event_type {
+                    crate::device_info::DeviceEventType::Connected => {
+                        Style::new().fg_color(Some(AnsiColor::Green))
+                    }
+                    crate::device_info::DeviceEventType::Disconnected => {
+                        Style::new().fg_color(Some(AnsiColor::Red))
+                    }
+                }
+            } else {
+                Style::new()
+            };
+            let mut buf = Vec::new();
+            write!(buf, "{} ", event_icon)?;
+            style.write_ansi(&mut buf)?;
+            write!(
+                buf,
+                "{} | VID: {} PID: {} | Serial: {} | Event: {:?} | {}",
+                device_info.device_name,
+                device_info.vendor_id,
+                device_info.product_id,
+                device_info.serial_number.as_deref().unwrap_or("-"),
+                device_info.event_type,
+                device_info.timestamp
+            )?;
+            let output = String::from_utf8_lossy(&buf);
+            println!("{}", output);
+            if let Some(file) = &mut self.log_file {
+                writeln!(file, "{}", output)?;
+                file.flush()?;
+            }
         }
-
         Ok(())
     }
 }
