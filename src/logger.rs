@@ -2,6 +2,11 @@
 //!
 //! This module provides functionality for logging USB device events to console
 //! and files in various formats (plain text and JSON).
+//!
+//! ## Notes
+//!
+//! - JSON output uses serde serialization; device handles are excluded from JSON.
+//! - File logging respects system file permissions and will fail if permissions are insufficient.
 
 use crate::device_info::UsbDeviceInfo;
 use std::fs::OpenOptions;
