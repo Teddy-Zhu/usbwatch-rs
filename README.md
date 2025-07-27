@@ -1,23 +1,5 @@
 # 🔌 USBWatch
 
-A cross-platform USB device monitoring tool written in Rust that provides real-time detection of USB device connection and disconnection events.
-
-## ✨ Features
-
-- **Cross-Platform Support**: Works on Linux and Windows
-- **Real-Time Monitoring**: Detect USB device events as they happen
-- **Multiple Output Formats**: Plain text and JSON output
-- **File Logging**: Save events to a log file
-- **Built-in Installation**: Install and uninstall from system PATH
-- **Lightweight**: Fast, efficient monitoring with minimal resource usage
-
-## 🚀 Quick Start
-
-For installation, troubleshooting, and platform-specific details, see [INSTALL.md](INSTALL.md).
-Install the `usbwatch` binary to your system PATH. On Unix systems, this requires administrator privileges.
-
-# 🔌 USBWatch
-
 A cross-platform USB device monitoring tool written in Rust that provides real-time detection of USB device connection and disconnection events on Linux, Windows, and macOS.
 
 ## ✨ Features
