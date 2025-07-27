@@ -41,10 +41,10 @@ impl Logger {
     /// use usbwatch_rs::logger::Logger;
     ///
     /// // Console-only logger with plain text
-    /// let logger = Logger::new(false, None)?;
+    /// let logger = Logger::new(false, None, true)?;
     ///
     /// // JSON logger with file output
-    /// let logger = Logger::new(true, Some("usb-events.json"))?;
+    /// let logger = Logger::new(true, Some("usb-events.json"), true)?;
     /// # Ok::<(), Box<dyn std::error::Error>>(())
     /// ```
     pub fn new(
