@@ -14,6 +14,7 @@
 //! - **Multiple output formats**: Plain text and JSON
 //! - **File logging**: Save events to log files
 //! - **Async/await support**: Built with Tokio for efficient I/O
+//! - **Device handle traits**: Access platform-specific device handles for advanced operations
 //!
 //! ## Quick Start
 //!
@@ -33,7 +34,7 @@
 //! ### Library Usage
 //!
 //! ```rust,no_run
-//! use usbwatch_rs::{UsbWatcher, UsbDeviceInfo};
+//! use usbwatch_rs::{UsbWatcher, UsbDeviceInfo, AsDeviceHandle, DeviceHandle};
 //! use tokio::sync::mpsc;
 //!
 //! #[tokio::main]
@@ -51,11 +52,39 @@
 //!     // Process device events
 //!     while let Some(device_info) = rx.recv().await {
 //!         println!("Device event: {}", device_info);
+//!         // Access platform-specific device handle
+//!         match device_info.as_device_handle() {
+//!             DeviceHandle::Linux { sysfs_path, device_node } => {
+//!                 println!("Linux sysfs path: {}", sysfs_path);
+//!                 if let Some(node) = device_node {
+//!                     println!("Device node: {}", node);
+//!                 }
+//!             }
+//!             DeviceHandle::Windows { instance_id, interface_path } => {
+//!                 println!("Windows instance ID: {}", instance_id);
+//!                 if let Some(path) = interface_path {
+//!                     println!("Interface path: {}", path);
+//!                 }
+//!             }
+//!             DeviceHandle::Unknown => {
+//!                 println!("No platform-specific handle available");
+//!             }
+//!         }
 //!     }
 //!
 //!     Ok(())
 //! }
 //! ```
+//!
+//! ## Library API Highlights
+//!
+//! - [`UsbWatcher`] - Cross-platform watcher for USB device events
+//! - [`UsbDeviceInfo`] - Struct containing device metadata and event info
+//! - [`DeviceHandle`] - Enum for platform-specific device handles
+//! - [`AsDeviceHandle`] - Trait for accessing device handles from device info
+//! - [`create_watcher`] - Convenience function for watcher creation
+//! - [`monitor_with_callback`] - High-level async monitoring with callback
+//! - [`monitor_for_duration`] - Collect events for a fixed duration
 //!
 //! ## Platform Support
 //!
