@@ -14,12 +14,31 @@ A cross-platform USB device monitoring tool written in Rust that provides real-t
 ## 🚀 Quick Start
 
 For installation, troubleshooting, and platform-specific details, see [INSTALL.md](INSTALL.md).
+Install the `usbwatch` binary to your system PATH. On Unix systems, this requires administrator privileges.
+
+# 🔌 USBWatch
+
+A cross-platform USB device monitoring tool written in Rust that provides real-time detection of USB device connection and disconnection events on Linux, Windows, and macOS.
+
+## ✨ Features
+
+- **Cross-Platform Support**: Linux, Windows, macOS
+- **Real-Time Monitoring**: Detect USB device events as they happen
+- **Colored Output**: Modern, readable CLI output
+- **Multiple Output Formats**: Plain text and JSON output
+- **File Logging**: Save events to a log file
+- **Built-in Installation**: Install and uninstall from system PATH
+- **Lightweight**: Fast, efficient monitoring with minimal resource usage
+
+## 🚀 Quick Start
+
+For installation, troubleshooting, and platform-specific details, see [INSTALL.md](INSTALL.md).
 
 ### Basic Usage
 
 ```bash
 # Monitor USB devices (default behaviour)
-usbwatch
+└── INSTALL.md            # Detailed installation guide
 
 # Monitor with JSON output
 usbwatch --json
@@ -29,6 +48,10 @@ usbwatch --logfile usb-events.log
 
 # Monitor with both JSON and file logging
 usbwatch --json --logfile usb-events.json
+
+# Install or uninstall the CLI tool
+usbwatch install
+usbwatch uninstall
 ```
 
 ## 📋 Commands
@@ -68,7 +91,7 @@ Remove the `usbwatch` binary from your system PATH.
 ### Plain Text Format
 
 ```
-🔌 USB Device Monitor - usbwatch v0.1.0
+🔌 USB Device Monitor - usbwatch v0.4.1
 Press Ctrl+C to stop monitoring...
 Starting USB device monitoring on Linux...
 [2025-07-27 10:30:15 UTC] CONNECTED - SanDisk Ultra USB 3.0 (VID: 0781, PID: 5583) Serial: 4C530001234567891234
@@ -78,25 +101,16 @@ Starting USB device monitoring on Linux...
 ### JSON Format
 
 ```json
-{"device_name":"SanDisk Ultra USB 3.0","vendor_id":"0781","product_id":"5583","serial_number":"4C530001234567891234","timestamp":"2025-07-27T10:30:15.123456789Z","event_type":"Connected"}
-{"device_name":"SanDisk Ultra USB 3.0","vendor_id":"0781","product_id":"5583","serial_number":"4C530001234567891234","timestamp":"2025-07-27T10:30:45.987654321Z","event_type":"Disconnected"}
+{
+  "device_name": "SanDisk Ultra USB 3.0",
+  "vendor_id": "0781",
+  "product_id": "5583",
+  "serial_number": "4C530001234567891234",
+  "timestamp": "2025-07-27T10:30:15.123456789Z",
+  "event_type": "Connected"
+}
 ```
 
-## Project Structure
-
-```
-usbwatch-rs/
-├── src/
-│   ├── main.rs           # CLI interface and subcommands
-│   ├── device_info.rs    # USB device data structures
-│   ├── logger.rs         # Output formatting and file logging
-│   └── watcher/          # Platform-specific monitoring
-│       ├── mod.rs        # Cross-platform abstraction
-│       ├── linux.rs      # Linux sysfs implementation
-│       └── windows.rs    # Windows Win32 API implementation
-├── Cargo.toml            # Project configuration
-├── README.md             # This file
-└── INSTALL.md            # Detailed installation guide
 ```
 
 ## 🤝 Contributing
@@ -130,3 +144,4 @@ USBWatch is designed to be lightweight and efficient:
 - Low memory footprint
 - Configurable polling intervals
 - No blocking operations in the main thread
+```

@@ -1,12 +1,15 @@
 //! Event logging and output formatting for USB device monitoring.
 //!
-//! This module provides functionality for logging USB device events to console
-//! and files in various formats (plain text and JSON).
+//! Provides modern, colored, and structured output for USB device events in both plain text and JSON formats.
+//! Supports logging to files and the console, with automatic color detection for terminals.
 //!
-//! ## Notes
+//! ## Features
 //!
-//! - JSON output uses serde serialization; device handles are excluded from JSON.
-//! - File logging respects system file permissions and will fail if permissions are insufficient.
+//! - Colored output using the `colored` crate
+//! - JSON and plain text output
+//! - File logging
+//! - Configurable via CLI options
+//! - Robust error handling
 
 use crate::device_info::UsbDeviceInfo;
 use colored::*;

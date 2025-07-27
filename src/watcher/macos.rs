@@ -1,6 +1,6 @@
 //! macOS-specific USB device watcher implementation.
 //!
-//! Uses IOKit FFI to detect USB device events in real time.
+//! Uses IOKit FFI to detect USB device events in real time. Supports colored output and modern CLI integration.
 
 #[cfg(target_os = "macos")]
 use crate::device_info::{DeviceEventType, DeviceHandle, UsbDeviceInfo};

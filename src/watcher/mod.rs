@@ -1,7 +1,7 @@
 //! Cross-platform USB device monitoring implementations.
 //!
-//! This module provides platform-specific USB monitoring implementations
-//! that are abstracted behind a common `UsbWatcher` interface.
+//! Platform-specific USB monitoring implementations for Linux, Windows, and macOS, abstracted behind a common `UsbWatcher` interface.
+//! Uses sysfs (Linux), Win32 APIs (Windows), and IOKit (macOS).
 
 /// Linux-specific USB monitoring implementation using sysfs.
 #[cfg(target_os = "linux")]

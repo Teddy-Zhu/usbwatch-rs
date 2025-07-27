@@ -1,23 +1,30 @@
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+git clone https://github.com/NotKeira/usbwatch-rs.git
+
 # 📦 Installation Guide
 
-This guide provides detailed installation instructions for USBWatch across different platforms and deployment scenarios.
+This guide provides installation instructions for USBWatch on Linux, Windows, and macOS, including CLI and library usage.
 
 ## 🚀 Quick Installation
 
-### Option 1: Using Built-in Installer (Recommended)
+### Option 1: Cargo Install (Recommended)
 
 ```bash
-# Build the project
-cargo build --release
-
-# Install to system PATH
-sudo ./target/release/usbwatch install
+# Install the CLI tool globally
+cargo install usbwatch-rs
 
 # Verify installation
 usbwatch --version
 ```
 
-### Option 2: Manual Installation
+### Option 2: Add as a Library Dependency
+
+```bash
+# Add usbwatch-rs to your Rust project
+cargo add usbwatch-rs
+```
+
+### Option 3: Manual Installation
 
 ```bash
 # Build the project
@@ -32,65 +39,44 @@ sudo chmod +x /usr/local/bin/usbwatch
 
 ## 🖥️ Platform-Specific Instructions
 
-### Linux (Ubuntu, Debian, CentOS, etc.)
+### Linux, Windows, macOS
 
-#### Prerequisites
-
-```bash
-# Install Rust (if not already installed)
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source ~/.bashrc
-
-# Install build dependencies
-sudo apt update
-sudo apt install build-essential
-```
-
-#### Installation Steps
-
-```bash
-# Clone the repository
-git clone https://github.com/NotKeira/usbwatch-rs.git
-cd usbwatch-rs
-
-# Build the project
-cargo build --release
-
-# Install using built-in installer
-sudo ./target/release/usbwatch install
-
-# Test the installation
-usbwatch --help
-```
+- Install Rust: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
+- Build: `cargo build --release`
+- Install: `cargo install usbwatch-rs` (recommended)
+- Manual: Copy binary to system path and set permissions
 
 #### Installation Paths
 
-- **System-wide**: `/usr/local/bin/usbwatch`
-- **User-specific**: `~/.local/bin/usbwatch` (manual installation)
+- **System-wide**: `/usr/local/bin/usbwatch` (Linux/macOS)
+- **User-specific**: `~/.local/bin/usbwatch` (manual)
+- **Windows**: `C:\Program Files\usbwatch\usbwatch.exe` (add to PATH)
 
-### Windows
+## Uninstall
 
-#### Prerequisites
+```bash
+usbwatch uninstall
+```
 
-- Install Rust from [rustup.rs](https://rustup.rs/)
-- Install Visual Studio Build Tools or MinGW-w64
+## Troubleshooting
 
-#### Installation Steps (PowerShell as Administrator)
-
-```powershell
-# Clone the repository
-git clone https://github.com/NotKeira/usbwatch-rs.git
-cd usbwatch-rs
+- See [FAQ & Troubleshooting](usbwatch-rs.wiki/FAQ‐Troubleshooting.md) for common issues.
+  git clone https://github.com/NotKeira/usbwatch-rs.git
+  cd usbwatch-rs
 
 # Build the project
+
 cargo build --release
 
 # Install using built-in installer
+
 .\target\release\usbwatch.exe install
 
 # Test the installation
+
 usbwatch --help
-```
+
+````
 
 #### Installation Paths
 
@@ -119,7 +105,7 @@ cargo build --release --target x86_64-pc-windows-gnu
 
 # The Windows binary will be at:
 # target/x86_64-pc-windows-gnu/release/usbwatch.exe
-```
+````
 
 ### Building Linux Binaries on Windows (WSL)
 

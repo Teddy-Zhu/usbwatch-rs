@@ -2,19 +2,18 @@
 //!
 //! A cross-platform USB device monitoring library and command-line tool.
 //!
-//! USBWatch provides real-time monitoring of USB device connection and
-//! disconnection events on Linux and Windows systems. It offers both
-//! a library API for integration into other applications and a standalone
-//! command-line tool.
+//! USBWatch provides real-time monitoring of USB device connection and disconnection events on Linux, Windows, and macOS. It offers both a library API for integration into other applications and a standalone command-line tool.
 //!
 //! ## Features
 //!
-//! - **Cross-platform**: Works on Linux (sysfs) and Windows (Win32 APIs)
+//! - **Cross-platform**: Linux (sysfs), Windows (Win32 APIs), macOS (IOKit)
 //! - **Real-time monitoring**: Detect USB events as they happen
 //! - **Multiple output formats**: Plain text and JSON
 //! - **File logging**: Save events to log files
+//! - **Colored output**: Modern, readable CLI output
 //! - **Async/await support**: Built with Tokio for efficient I/O
 //! - **Device handle traits**: Access platform-specific device handles for advanced operations
+//! - **Install/uninstall commands**: Manage CLI tool from the command line
 //!
 //! ## Quick Start
 //!
@@ -29,6 +28,13 @@
 //!
 //! # Monitor and log to file
 //! usbwatch --logfile usb-events.log
+//!
+//! # Monitor with colored output (default if supported)
+//! usbwatch
+//!
+//! # Install or uninstall the CLI tool
+//! usbwatch install
+//! usbwatch uninstall
 //! ```
 //!
 //! ### Library Usage
@@ -67,6 +73,10 @@
 //!                 if let Some(path) = interface_path {
 //!                     println!("Interface path: {}", path);
 //!                 }
+//!             }
+//!             #[cfg(target_os = "macos")]
+//!             DeviceHandle::Macos { device_id } => {
+//!                 println!("macOS device ID: {}", device_id);
 //!             }
 //!             _ => {
 //!                 println!("No platform-specific handle available");

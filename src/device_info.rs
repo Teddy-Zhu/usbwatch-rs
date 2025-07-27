@@ -1,7 +1,7 @@
 //! USB device information structures and event types.
 //!
-//! This module provides the core data structures for representing USB device
-//! information and events in the usbwatch monitoring system.
+//! Core data structures for representing USB device information and events in the usbwatch monitoring system.
+//! Supports Linux, Windows, and macOS device handles and event types.
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
