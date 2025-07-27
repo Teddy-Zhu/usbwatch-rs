@@ -160,7 +160,7 @@ Contributions are welcome! Please feel free to submit issues and pull requests.
 
 ## 📄 Licence
 
-This project is licensed under the Apache 2.0 Licence - see the [LICENCE](LICENCE) file for details.
+This project is licensed under the Apache 2.0 Licence - see the [LICENSE](LICENSE) file for details.
 
 ## 🔗 Related Projects
 
