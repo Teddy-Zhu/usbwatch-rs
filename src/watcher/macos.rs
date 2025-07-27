@@ -36,7 +36,7 @@ impl MacosUsbWatcher {
             let mut iter: io_iterator_t = 0;
             let kr = IOServiceGetMatchingServices(kIOMasterPortDefault, matching_dict, &mut iter);
             if kr != 0 {
-                return Err(format!("IOServiceGetMatchingServices failed: {}", kr));
+                return Err(format!("IOServiceGetMatchingServices failed: {kr}"));
             }
 
             loop {
@@ -64,7 +64,7 @@ impl MacosUsbWatcher {
                     timestamp: chrono::Utc::now(),
                     event_type: DeviceEventType::Connected,
                     device_handle: DeviceHandle::Macos {
-                        device_id: format!("{}", device),
+                        device_id: format!("{device}"),
                     },
                 };
                 let _ = self.tx.send(info).await;
@@ -72,8 +72,6 @@ impl MacosUsbWatcher {
             }
             IOObjectRelease(iter);
         }
-        // Run the macOS runloop to listen for events (stub: just enumerate once)
-        // In a real implementation, register for notifications and run loop
         Ok(())
     }
 }
