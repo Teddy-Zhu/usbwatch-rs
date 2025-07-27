@@ -76,7 +76,7 @@ pub mod logger;
 pub mod watcher;
 
 // Re-export commonly used types
-pub use device_info::{DeviceEventType, UsbDeviceInfo};
+pub use device_info::{AsDeviceHandle, DeviceEventType, DeviceHandle, UsbDeviceInfo};
 pub use logger::{logger_task, Logger};
 pub use watcher::UsbWatcher;
 
@@ -88,3 +88,211 @@ pub const NAME: &str = env!("CARGO_PKG_NAME");
 
 /// Library description
 pub const DESCRIPTION: &str = env!("CARGO_PKG_DESCRIPTION");
+
+/// A result type for USB monitoring operations
+pub type Result<T> = std::result::Result<T, String>;
+
+/// Create a new USB watcher with the given channel sender.
+///
+/// This is a convenience function that creates a new [`UsbWatcher`] instance.
+///
+/// # Arguments
+///
+/// * `sender` - The channel sender to send USB device events to
+///
+/// # Returns
+///
+/// Returns a [`Result`] containing the [`UsbWatcher`] or an error if the watcher
+/// cannot be created (e.g., on unsupported platforms).
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use usbwatch_rs::{create_watcher, UsbDeviceInfo};
+/// use tokio::sync::mpsc;
+///
+/// #[tokio::main]
+/// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     let (tx, mut rx) = mpsc::channel::<UsbDeviceInfo>(100);
+///     let watcher = create_watcher(tx)?;
+///     
+///     // Use the watcher...
+///     Ok(())
+/// }
+/// ```
+pub fn create_watcher(sender: tokio::sync::mpsc::Sender<UsbDeviceInfo>) -> Result<UsbWatcher> {
+    UsbWatcher::new(sender).map_err(|e| e.to_string())
+}
+
+/// Start monitoring USB devices with a callback function.
+///
+/// This is a high-level convenience function that sets up monitoring and calls
+/// the provided callback for each USB device event.
+///
+/// # Arguments
+///
+/// * `callback` - A function that will be called for each USB device event
+///
+/// # Returns
+///
+/// Returns a [`Result`] that completes when monitoring stops or encounters an error.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use usbwatch_rs::{monitor_with_callback, UsbDeviceInfo};
+///
+/// #[tokio::main]
+/// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     monitor_with_callback(|device_info| {
+///         println!("USB event: {}", device_info);
+///     }).await?;
+///     
+///     Ok(())
+/// }
+/// ```
+pub async fn monitor_with_callback<F>(mut callback: F) -> Result<()>
+where
+    F: FnMut(UsbDeviceInfo) + Send + 'static,
+{
+    let (tx, mut rx) = tokio::sync::mpsc::channel(100);
+    let watcher = create_watcher(tx)?;
+
+    // Process events with callback in background
+    let callback_handle = tokio::spawn(async move {
+        while let Some(device_info) = rx.recv().await {
+            callback(device_info);
+        }
+    });
+
+    // Start monitoring (this will block until monitoring completes)
+    let monitoring_result = watcher.start_monitoring().await;
+
+    // Stop callback processing
+    callback_handle.abort();
+
+    monitoring_result.map_err(|e| e.to_string())
+}
+
+/// Start monitoring USB devices and collect events into a vector.
+///
+/// This function monitors for the specified duration and returns all collected events.
+/// Useful for testing or collecting a snapshot of USB activity.
+///
+/// # Arguments
+///
+/// * `duration` - How long to monitor for events
+///
+/// # Returns
+///
+/// Returns a [`Result`] containing a vector of [`UsbDeviceInfo`] events collected
+/// during the monitoring period.
+///
+/// # Examples
+///
+/// ```rust,no_run
+/// use usbwatch_rs::monitor_for_duration;
+/// use std::time::Duration;
+///
+/// #[tokio::main]
+/// async fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     let events = monitor_for_duration(Duration::from_secs(5)).await?;
+///     println!("Collected {} USB events", events.len());
+///     
+///     for event in events {
+///         println!("Event: {}", event);
+///     }
+///     
+///     Ok(())
+/// }
+/// ```
+pub async fn monitor_for_duration(duration: std::time::Duration) -> Result<Vec<UsbDeviceInfo>> {
+    let (tx, mut rx) = tokio::sync::mpsc::channel(100);
+    let watcher = create_watcher(tx)?;
+    let mut events = Vec::new();
+
+    // Collect events in background
+    let collection_handle = tokio::spawn(async move {
+        let mut collected = Vec::new();
+        let timeout = tokio::time::sleep(duration);
+        tokio::pin!(timeout);
+
+        loop {
+            tokio::select! {
+                device_info = rx.recv() => {
+                    if let Some(device_info) = device_info {
+                        collected.push(device_info);
+                    } else {
+                        break; // Channel closed
+                    }
+                }
+                _ = &mut timeout => {
+                    break; // Duration elapsed
+                }
+            }
+        }
+        collected
+    });
+
+    // Start monitoring task (but we'll collect separately)
+    let monitoring_task = async move { watcher.start_monitoring().await };
+
+    // Wait for collection to complete
+    tokio::select! {
+        collected = collection_handle => {
+            events = collected.map_err(|e| e.to_string())?;
+        }
+        result = monitoring_task => {
+            if let Err(e) = result {
+                return Err(e.to_string());
+            }
+        }
+    }
+
+    Ok(events)
+}
+
+/// Check if USB monitoring is supported on the current platform.
+///
+/// # Returns
+///
+/// Returns `true` if USB monitoring is supported on this platform, `false` otherwise.
+///
+/// # Examples
+///
+/// ```rust
+/// use usbwatch_rs::is_supported;
+///
+/// if is_supported() {
+///     println!("USB monitoring is supported on this platform");
+/// } else {
+///     println!("USB monitoring is not supported on this platform");
+/// }
+/// ```
+pub fn is_supported() -> bool {
+    cfg!(target_os = "linux") || cfg!(target_os = "windows")
+}
+
+/// Get information about the current platform's USB monitoring implementation.
+///
+/// # Returns
+///
+/// Returns a string describing the platform-specific implementation used
+/// for USB monitoring.
+///
+/// # Examples
+///
+/// ```rust
+/// use usbwatch_rs::platform_info;
+///
+/// println!("USB monitoring implementation: {}", platform_info());
+/// ```
+pub fn platform_info() -> &'static str {
+    if cfg!(target_os = "linux") {
+        "Linux sysfs (/sys/bus/usb/devices)"
+    } else if cfg!(target_os = "windows") {
+        "Windows Win32 Device Installation APIs"
+    } else {
+        "Unsupported platform"
+    }
+}
