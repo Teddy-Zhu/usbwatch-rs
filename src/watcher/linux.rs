@@ -10,16 +10,48 @@ use std::path::Path;
 use tokio::sync::mpsc;
 
 #[cfg(target_os = "linux")]
+/// Linux-specific USB device watcher implementation.
+///
+/// This watcher uses the Linux sysfs filesystem (`/sys/bus/usb/devices`) to monitor
+/// USB device connections and disconnections. It polls the filesystem periodically
+/// to detect changes and sends events through the provided channel.
 pub struct LinuxUsbWatcher {
     tx: mpsc::Sender<UsbDeviceInfo>,
 }
 
 #[cfg(target_os = "linux")]
 impl LinuxUsbWatcher {
+    /// Creates a new Linux USB watcher.
+    ///
+    /// # Arguments
+    ///
+    /// * `tx` - Channel sender for broadcasting USB device events
+    ///
+    /// # Returns
+    ///
+    /// A new `LinuxUsbWatcher` instance
     pub fn new(tx: mpsc::Sender<UsbDeviceInfo>) -> Self {
         Self { tx }
     }
 
+    /// Starts monitoring USB devices on Linux.
+    ///
+    /// This method continuously polls the `/sys/bus/usb/devices` directory
+    /// to detect USB device connection and disconnection events. It maintains
+    /// a map of known devices and compares against current devices to identify
+    /// changes.
+    ///
+    /// # Returns
+    ///
+    /// Returns `Ok(())` if monitoring stops gracefully, or `Err(String)` if
+    /// an error occurs during monitoring.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - The USB devices directory is not accessible
+    /// - File system operations fail
+    /// - Device information parsing fails
     pub async fn start_monitoring(&self) -> Result<(), String> {
         println!("Starting USB device monitoring on Linux...");
 
