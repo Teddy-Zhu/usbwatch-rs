@@ -2,6 +2,12 @@
 name = "usbwatch-rs"
 version = "0.1.0"
 edition = "2024"
+authors = ["NotKeira"]
+description = "A cross-platform USB device monitoring tool"
+repository = "https://github.com/NotKeira/usbwatch-rs"
+license = "MIT"
+keywords = ["usb", "monitoring", "cross-platform", "devices"]
+categories = ["command-line-utilities", "hardware-support"]
 
 [[bin]]
 name = "usbwatch"
