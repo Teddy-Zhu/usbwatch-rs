@@ -11,6 +11,10 @@ pub mod linux;
 #[cfg(target_os = "windows")]
 pub mod windows;
 
+/// macOS-specific USB monitoring implementation using IOKit or polling.
+#[cfg(target_os = "macos")]
+pub mod macos;
+
 use crate::device_info::UsbDeviceInfo;
 use tokio::sync::mpsc;
 
@@ -26,8 +30,11 @@ pub enum UsbWatcher {
     /// Linux implementation using sysfs
     #[cfg(target_os = "linux")]
     Linux(linux::LinuxUsbWatcher),
+    /// macOS implementation using IOKit or polling
+    #[cfg(target_os = "macos")]
+    Macos(macos::MacosUsbWatcher),
     /// Placeholder for unsupported platforms
-    #[cfg(not(any(target_os = "windows", target_os = "linux")))]
+    #[cfg(not(any(target_os = "windows", target_os = "linux", target_os = "macos")))]
     Unsupported,
 }
 
@@ -68,7 +75,13 @@ impl UsbWatcher {
             Ok(UsbWatcher::Linux(watcher))
         }
 
-        #[cfg(not(any(target_os = "windows", target_os = "linux")))]
+        #[cfg(target_os = "macos")]
+        {
+            let watcher = macos::MacosUsbWatcher::new(sender);
+            Ok(UsbWatcher::Macos(watcher))
+        }
+
+        #[cfg(not(any(target_os = "windows", target_os = "linux", target_os = "macos")))]
         {
             Ok(UsbWatcher::Unsupported)
         }
@@ -122,7 +135,12 @@ impl UsbWatcher {
                 .start_monitoring()
                 .await
                 .map_err(|e| Box::new(std::io::Error::other(e)))?),
-            #[cfg(not(any(target_os = "windows", target_os = "linux")))]
+            #[cfg(target_os = "macos")]
+            UsbWatcher::Macos(watcher) => Ok(watcher
+                .start_monitoring()
+                .await
+                .map_err(|e| Box::new(std::io::Error::other(e)))?),
+            #[cfg(not(any(target_os = "windows", target_os = "linux", target_os = "macos")))]
             UsbWatcher::Unsupported => Err("USB monitoring not supported on this platform".into()),
         }
     }

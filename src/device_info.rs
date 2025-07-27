@@ -29,6 +29,12 @@ pub enum DeviceHandle {
         /// Device interface path if available
         interface_path: Option<String>,
     },
+    /// macOS device handle (stub)
+    #[cfg(target_os = "macos")]
+    Macos {
+        /// macOS device identifier (stub)
+        device_id: String,
+    },
     /// Unknown or unsupported platform
     #[default]
     Unknown,
