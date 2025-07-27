@@ -5,15 +5,11 @@
 #[cfg(target_os = "macos")]
 use crate::device_info::{DeviceEventType, DeviceHandle, UsbDeviceInfo};
 #[cfg(target_os = "macos")]
-use core_foundation::runloop::{CFRunLoopGetCurrent, CFRunLoopRun};
-#[cfg(target_os = "macos")]
-use io_kit_sys::functions::*;
-#[cfg(target_os = "macos")]
 use io_kit_sys::types::*;
 #[cfg(target_os = "macos")]
-use std::ffi::CStr;
+use io_kit_sys::*;
 #[cfg(target_os = "macos")]
-use std::ptr;
+use std::ffi::CStr;
 #[cfg(target_os = "macos")]
 use tokio::sync::mpsc;
 
