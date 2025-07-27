@@ -13,7 +13,10 @@ use watcher::UsbWatcher;
 #[derive(Parser)]
 #[command(name = "usbwatch")]
 #[command(about = "A cross-platform USB device monitor")]
-#[command(version = "0.1.0")]
+#[command(version = env!("CARGO_PKG_VERSION"))]
+#[command(long_about = format!("USBWatch v{}\nA cross-platform USB device monitoring tool\n\nRepository: {}", 
+    env!("CARGO_PKG_VERSION"), 
+    env!("CARGO_PKG_REPOSITORY")))]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
@@ -52,7 +55,10 @@ async fn run_monitor(
     json: bool,
     logfile: Option<String>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    println!("🔌 USB Device Monitor - usbwatch v0.1.0");
+    println!(
+        "🔌 USB Device Monitor - usbwatch v{}",
+        env!("CARGO_PKG_VERSION")
+    );
     println!("Press Ctrl+C to stop monitoring...");
 
     // Create channel for device events
