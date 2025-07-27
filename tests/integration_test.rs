@@ -19,5 +19,4 @@ async fn test_usbwatcher_start_monitoring() {
     }
     // We can't guarantee a device event, but the test should run without panicking
     // The test passes if it runs without panicking
-    // The test passes if it runs without panicking
 }
