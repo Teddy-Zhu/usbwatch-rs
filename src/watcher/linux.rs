@@ -1,5 +1,5 @@
 #[cfg(target_os = "linux")]
-use crate::device_info::{DeviceEventType, UsbDeviceInfo};
+use crate::device_info::{DeviceEventType, DeviceHandle, UsbDeviceInfo};
 #[cfg(target_os = "linux")]
 use std::collections::HashMap;
 #[cfg(target_os = "linux")]
@@ -174,12 +174,18 @@ impl LinuxUsbWatcher {
             "Unknown Device".to_string()
         };
 
-        Ok(UsbDeviceInfo::new(
+        let device_handle = DeviceHandle::Linux {
+            sysfs_path: device_path.to_string_lossy().to_string(),
+            device_node: None, // Could be enhanced to detect device nodes
+        };
+
+        Ok(UsbDeviceInfo::with_handle(
             device_name,
             vendor_id,
             product_id,
             serial_number,
             DeviceEventType::Connected, // Will be updated by caller
+            device_handle,
         ))
     }
     fn read_sys_file(&self, device_path: &Path, filename: &str) -> Option<String> {
