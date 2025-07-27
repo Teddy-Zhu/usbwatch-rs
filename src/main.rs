@@ -1,9 +1,23 @@
+//! # USBWatch CLI
+//!
+//! This is the command-line interface for USBWatch.
+//!
+//! ## Subcommands
+//! - `monitor` (default): Monitor USB device events in real-time
+//! - `install`: Install usbwatch to system PATH
+//! - `uninstall`: Uninstall usbwatch from system PATH
+//!
+//! ## Options
+//! - `--json`: Output events in JSON format
+//! - `--logfile <PATH>`: Log events to the specified file
+//!
+//! For installation and troubleshooting, see INSTALL.md.
 mod device_info;
 mod logger;
 mod watcher;
 
 use clap::{Parser, Subcommand};
-use logger::{Logger, logger_task};
+use logger::{logger_task, Logger};
 use std::env;
 use std::fs;
 use std::path::Path;
