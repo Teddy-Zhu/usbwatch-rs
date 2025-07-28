@@ -172,6 +172,7 @@ impl UsbDeviceInfo {
     ///     handle,
     /// );
     /// ```
+    #[allow(dead_code)]
     pub fn with_handle(
         device_name: String,
         vendor_id: String,
