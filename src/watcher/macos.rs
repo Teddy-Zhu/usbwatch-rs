@@ -24,24 +24,24 @@ pub struct MacosUsbWatcher {
 
 #[cfg(target_os = "macos")]
 impl MacosUsbWatcher {
+    /// Creates a new `MacosUsbWatcher` with the given channel sender.
+    ///
+    /// # Arguments
+    ///
+    /// * `tx` - Tokio channel sender for publishing USB device events.
     pub fn new(tx: mpsc::Sender<UsbDeviceInfo>) -> Self {
-        /// Creates a new `MacosUsbWatcher` with the given channel sender.
-        ///
-        /// # Arguments
-        ///
-        /// * `tx` - Tokio channel sender for publishing USB device events.
         Self { tx }
     }
 
+    /// Starts monitoring USB devices on macOS.
+    ///
+    /// Enumerates currently connected USB devices and sends their info through the channel.
+    /// In a full implementation, this would register for device notifications and run the event loop.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if IOKit FFI calls fail or device enumeration cannot be performed.
     pub async fn start_monitoring(&self) -> Result<(), String> {
-        /// Starts monitoring USB devices on macOS.
-        ///
-        /// Enumerates currently connected USB devices and sends their info through the channel.
-        /// In a full implementation, this would register for device notifications and run the event loop.
-        ///
-        /// # Errors
-        ///
-        /// Returns an error if IOKit FFI calls fail or device enumeration cannot be performed.
         println!("Starting USB device monitoring on macOS...");
         // SAFETY: FFI calls to IOKit
         unsafe {
