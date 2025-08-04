@@ -177,7 +177,7 @@ impl WindowsUsbWatcher {
             let mut property_type = 0u32;
 
             // Get required buffer size
-            let _ = SetupDiGetDeviceRegistryPropertyA(
+            let _ = SetupDiGetDeviceRegistryPropertyW(
                 device_info_set,
                 device_info_data,
                 property,
@@ -191,7 +191,7 @@ impl WindowsUsbWatcher {
             }
 
             let mut buffer = vec![0u8; required_size as usize];
-            if SetupDiGetDeviceRegistryPropertyA(
+            if SetupDiGetDeviceRegistryPropertyW(
                 device_info_set,
                 device_info_data,
                 property,
@@ -201,10 +201,16 @@ impl WindowsUsbWatcher {
             )
             .is_ok()
             {
-                // Convert to string, removing null terminators
-                let result = String::from_utf8_lossy(&buffer)
-                    .trim_end_matches('\0')
-                    .to_string();
+                // Convert UTF-16 bytes to UTF-16 words
+                let utf16_slice = std::slice::from_raw_parts(
+                    buffer.as_ptr() as *const u16,
+                    buffer.len() / 2,
+                );
+                
+                // Find the null terminator and create string from UTF-16
+                let end = utf16_slice.iter().position(|&x| x == 0).unwrap_or(utf16_slice.len());
+                let result = String::from_utf16_lossy(&utf16_slice[..end]);
+                
                 if !result.is_empty() {
                     Some(result)
                 } else {
